@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="JITx hardware">
+  <rect width="128" height="128" rx="26" fill="#0f1b2d"/>
+  <g stroke="#c98a4b" stroke-width="4" stroke-linecap="round" fill="none">
+    <path d="M14 40h22v14h20"/>
+    <path d="M14 64h20"/>
+    <path d="M14 88h22v-14h20"/>
+    <path d="M84 40h30"/>
+    <path d="M84 64h30"/>
+    <path d="M84 88h30"/>
+  </g>
+  <g fill="#c98a4b">
+    <circle cx="12" cy="40" r="4"/>
+    <circle cx="12" cy="64" r="4"/>
+    <circle cx="12" cy="88" r="4"/>
+    <circle cx="116" cy="40" r="4"/>
+    <circle cx="116" cy="64" r="4"/>
+    <circle cx="116" cy="88" r="4"/>
+  </g>
+  <rect x="44" y="34" width="40" height="60" rx="8" fill="#1d3450" stroke="#7fb3a8" stroke-width="3"/>
+  <path d="M76 46v30a10 10 0 0 1-20 0v-6" stroke="#8fd3c4" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <circle cx="56" cy="46" r="3" fill="#8fd3c4"/>
+</svg>

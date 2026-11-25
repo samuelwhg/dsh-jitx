@@ -1,0 +1,72 @@
+{
+  "name": "dsh-jitx",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "JITx hardware development for DeepSeek Harness: uv-managed project environments, the official JITx skills, project-first MCP wiring, and a JITx agent preset.",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "mcp",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.2-rc.2 <0.3.0"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh-tools": ">=0.2.0-0 <0.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "jitx",
+    "pcb",
+    "hardware",
+    "uv",
+    "agent-preset"
+  ],
+  "license": "MIT",
+  "icon": "./icon.svg",
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "samuelwhg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelwhg/dsh-jitx.git"
+  },
+  "homepage": "https://github.com/samuelwhg/dsh-jitx#readme",
+  "bugs": {
+    "url": "https://github.com/samuelwhg/dsh-jitx/issues"
+  }
+}

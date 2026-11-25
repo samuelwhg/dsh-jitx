@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "JITx hardware",
+    "description": "Set up a uv-managed JITx environment, install the official JITx skills, wire the JITx MCP server at the right scope, and use the dedicated JITx agent preset."
+  }
+}

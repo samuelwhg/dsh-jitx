@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "JITx 硬件开发",
+    "description": "用 uv 配置 JITx 工程环境、安装官方 JITx 技能、按合适的作用域挂载 JITx MCP，并提供一个专用的 JITx 开发模式。"
+  }
+}
