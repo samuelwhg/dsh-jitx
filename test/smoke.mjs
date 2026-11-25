@@ -15,10 +15,12 @@ import {
   MCP_SERVER_PATH,
   configureGlobalMcp,
   detectWorkspaceMcp,
+  pinnedVersions,
   readSkillsMarker,
   mcpServerEntry,
   readProjectMcp,
   removeProjectMcp,
+  tarballUrls,
   writeProjectMcp,
 } from '../lib/jitx.js'
 
@@ -41,6 +43,19 @@ try {
   assert.equal(merged.data.mcpServers.jitx.env.JITX_PROJECT, root)
   assert.deepEqual(removeProjectMcp(root), { removed: true, file: merged.file })
   assert.deepEqual(Object.keys(readProjectMcp(root).data.mcpServers), ['other'])
+
+  // A ref may be a tag, so the tarball fallback must try tags as well as branches.
+  assert.deepEqual(tarballUrls('v4.6.0').map((url) => new URL(url).pathname), [
+    '/JITx-Inc/jitx-skills/tar.gz/refs/heads/v4.6.0',
+    '/JITx-Inc/jitx-skills/tar.gz/refs/tags/v4.6.0',
+  ])
+
+  // The setup fast path keys off exact pins in pyproject.toml.
+  const pinned = join(root, 'pinned')
+  mkdirSync(pinned, { recursive: true })
+  writeFileSync(join(pinned, 'pyproject.toml'), '[project]\ndependencies = [\n  "jitx==4.6.0",\n  "jitxlib-standard==4.6.0",\n]\n')
+  assert.deepEqual(pinnedVersions(pinned), { jitx: '4.6.0', jitxlib: '4.6.0' })
+  assert.deepEqual(pinnedVersions(join(root, 'no-pyproject')), { jitx: undefined, jitxlib: undefined })
 
   // Detection must always answer with a decision, never throw.
   const detection = detectWorkspaceMcp()

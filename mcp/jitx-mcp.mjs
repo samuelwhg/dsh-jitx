@@ -14,12 +14,14 @@
  * @module dsh-jitx/mcp
  */
 
+import { readFileSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 import { isAbsolute, resolve } from 'node:path'
 import { MCP_SERVER_NAME, checkProject, detectWorkspaceMcp, readProjectMcp } from '../lib/jitx.js'
 import { findExecutable, run } from '../lib/run.js'
 
-const SERVER_VERSION = '0.1.0'
+/** Report the package's own version instead of a copy that drifts on release. */
+const SERVER_VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
 const ALLOWED_COMMANDS = new Set(['project', 'design', 'runtime', 'auth', 'support', 'ui'])
 
 /** Resolve the project directory from arguments or the environment. */

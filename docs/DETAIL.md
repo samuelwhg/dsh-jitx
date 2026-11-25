@@ -18,15 +18,20 @@ step does not require a global JITx install.
 ### `jitx_env_setup`
 
 1. `uv --version` (missing → actionable install hint, no partial writes)
-2. Scaffold only when `pyproject.toml` is absent:
+2. Reuse fast path, before any write: when `pyproject.toml` already pins both
+   `jitx==<v>` and `jitxlib-standard==<v>`, `.venv` exists, the probes answer,
+   and the requested runtime is already installed, the tool returns that
+   verified state (`reused: true`) and runs none of steps 3–7. This is the
+   normal case on an already set-up project and skips the expensive `uv sync`.
+3. Scaffold only when `pyproject.toml` is absent:
    `uv tool run --from jitx==<v> jitx project layout init . --name <name>`
-3. `uv add --project <dir> jitx==<v> jitxlib-standard==<v>`
-4. `uv sync --project <dir>`
-5. `uv run --project <dir> python -V` and `jitx --version`
-6. `uv run --project <dir> jitx runtime install --prod [--target <t>]`
+4. `uv add --project <dir> jitx==<v> jitxlib-standard==<v>`
+5. `uv sync --project <dir>`
+6. `uv run --project <dir> python -V` and `jitx --version`, probed concurrently
+7. `uv run --project <dir> jitx runtime install --prod [--target <t>]`
    (skipped when `installRuntime: false`)
-7. `jitx runtime introspect` + `jitx runtime status` + `jitx auth show` for the
-   final report
+8. `jitx runtime introspect` + `jitx runtime status` + `jitx auth show` for the
+   final report (introspect and status run concurrently)
 
 Each step is recorded as `{name, ok, detail}` and the whole run throws only
 when a step makes the environment unusable (missing uv, failed scaffold, failed
@@ -44,6 +49,12 @@ project `jitx` CLI, the runtime directory (`<jitx_root>/<version>`), the license
 (`Authorized: yes` in `jitx auth show`), and the skills marker. It also reports
 the MCP scope decision so a stale global registration is visible before it
 surprises the user. Nothing is installed and no file is written.
+
+Independent probes run concurrently (Python and CLI versions; runtime and
+license), so one check costs roughly its slowest probe. Passing file checks
+report `found` instead of an absolute path — the header already names the
+project, and the detailed evidence stays on disk. Run it once per environment
+state, not before every JITx command.
 
 ### `jitx_skills_install`
 
@@ -109,6 +120,36 @@ Environment passed to the server: `JITX_PROJECT=<project>`, `JITX_UV=<uv path
 when discovered>`. On Electron-packaged DSH, `ELECTRON_RUN_AS_NODE=1` is added
 so `process.execPath` behaves as Node.
 
+## Layout and routing gates
+
+The `jitx` preset carries four rules that decide whether a layout is
+electrically sound. They bind the agent, not the tools: the plugin cannot
+inspect a design, so the gates have to live where the model reads them (the
+persona prefix in `cordis.patch.yml`).
+
+1. Rules before geometry. JITX routes to the rules it is given, so a board that
+   builds clean can still arc across an isolation gap, overheat a power trace,
+   or couple a switch node into a receiver. List what the layout must hold
+   (current, working voltage and isolation, impedance, return path, coupling,
+   assembly) and write the matching `design_constraint` rules and net-class
+   tags first — `jitx-layout-constraints`.
+2. No invented numbers. A value comes from the prompt, an existing rule, a
+   fab-sheet row, a datasheet, or a quoted standard; otherwise it is an open
+   item for the user, never a guess.
+3. Assign pins before routing. The router works with the `provide`/`require`
+   pin assignment it is given — `jitx-pin-assignment`.
+4. Read the geometry back. `status: ok` is not routed copper: verify from
+   Python introspection, `rd.issues()`, and skew margin — `jitx-code-layout`,
+   `jitx-interactive-layout`.
+5. One layout. Script edits to the open layout are ordinary editable objects;
+   a `Route` in the design's Python is not. Do not maintain both, and commit
+   `designs/<design>/design-info/` with the source.
+
+Priority is part of the rule set: at equal priority the more specific
+condition wins, so a permissive rule can silently beat a protection rule added
+later. Keep one commented ladder and put protections above every permissive
+rule that can match their copper.
+
 ## MCP server
 
 `mcp/jitx-mcp.mjs` is a newline-delimited JSON-RPC 2.0 server on stdio.
@@ -146,6 +187,9 @@ user / model
                                   mcp/jitx-mcp.mjs ──► uv run jitx <args>
 ```
 
+`jitx_env_setup` short-circuits to the same read-only probes when the pins and
+runtime already match, so the common call performs no writes.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -153,7 +197,7 @@ user / model
 | `uv is not on PATH` | uv installed to `~/.local/bin` but the Harness process has an older PATH | install per hint, then restart DSH |
 | `uv add` fails at resolve | network/proxy, or Python < 3.12 on PATH | set `HTTPS_PROXY`; uv downloads its own Python if allowed |
 | Runtime install fails on non-Ubuntu Linux | JITx only auto-detects Ubuntu/macOS/Windows | `runtimeTarget: "ubuntu"` |
-| `WinError 32` during an upgrade | a `jitx.exe` is running | close JITx, then `.\.venv\Scripts\python.exe -m pip install --upgrade jitx` |
+| `WinError 32` during an upgrade | a `jitx.exe` is running | close JITx, then re-run `jitx_env_setup` (its `uv add` replaces the pinned `jitx`; do not pip-install into `.venv`) |
 | Skills clone fails with `GnuTLS recv error` | no proxy in the Harness environment | set `HTTPS_PROXY=http://127.0.0.1:10808` (or the user's proxy) |
 | MCP tools do not appear | project file is read at session start | start a new session |
 | `Configuration for "mcp-manager" is overridden by a home patch` | the profile cannot own this value | put the server in the home patch instead, or use project scope |

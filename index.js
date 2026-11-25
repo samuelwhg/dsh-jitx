@@ -101,10 +101,13 @@ function formatSetup(result) {
     `JITx CLI: ${result.jitx || 'unknown'}`,
     '',
     renderSteps(result.steps),
+  ]
+  if (result.reused) lines.push('', 'Environment already current; no install step ran.')
+  lines.push(
     '',
     `Runtime: ${result.runtime.installed ? `installed${result.runtime.version ? ` (${result.runtime.version})` : ''}, ${result.runtime.running ? 'running' : 'not running'}; target ${result.runtime.target}` : 'not installed'}`,
     `Auth: ${result.auth.authorized ? `authorized${result.auth.server ? ` (${result.auth.server})` : ''}` : 'not authorized'}`,
-  ]
+  )
   if (!result.auth.authorized) {
     lines.push('Run `uv run jitx auth login` in a terminal; the tool does not perform interactive login.')
   }
@@ -124,9 +127,6 @@ function formatCheck(result, mcp, projectServer) {
   ]
   const scope = mcp.active || projectServer ? 'project (.dsh/mcp.json)' : 'global (mcp-manager)'
   lines.push('', `MCP scope: ${scope}${projectServer ? '; jitx entry present in the project file' : ''} — ${mcp.reason}`)
-  if (result.runtime.installed) {
-    lines.push(`Runtime: ${result.runtime.version ?? 'unknown'}, ${result.runtime.running ? 'running' : 'not running'}`)
-  }
   if (result.ok) lines.push('', 'Environment is complete.')
   else lines.push('', 'Fix the FAIL lines, then re-run jitx_check. jitx_env_setup repairs the environment; jitx_skills_install installs the skills.')
   return lines.join('\n')

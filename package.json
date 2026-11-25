@@ -1,6 +1,6 @@
 {
   "name": "dsh-jitx",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "JITx hardware development for DeepSeek Harness: uv-managed project environments, the official JITx skills, project-first MCP wiring, and a JITx agent preset.",
   "exports": {
