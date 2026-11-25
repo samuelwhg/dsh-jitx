@@ -10,7 +10,7 @@
 
 | 组成 | 位置 | 作用 |
 | --- | --- | --- |
-| `jitx_env_setup` 工具 | Host | 生成 JITx 项目骨架，用 uv 钉住 `jitx` + `jitxlib-standard`，同步 `.venv` / `uv.lock`，安装 JITx 运行时 |
+| `jitx_env_setup` 工具 | Host | 生成 JITx 项目骨架，用 uv 钉住 `jitx` + `jitxlib-standard`，同步 `.venv` / `uv.lock`，安装 JITx 运行时；环境已匹配时直接复用，不重建 |
 | `jitx_check` 工具 | Host | 只读体检：uv、Python 3.12+、CLI、运行时、许可证、技能、MCP 范围 |
 | `jitx_skills_install` 工具 | Host | 把 [JITx-Inc/jitx-skills](https://github.com/JITx-Inc/jitx-skills) 的 13 个官方技能复制到 `<project>/.dsh/skills`；项目目录不可写时退回 `$DSH_HOME/skills` |
 | `jitx_mcp_setup` 工具 | Host | `dsh-workspace-mcp` 生效时写 `<project>/.dsh/mcp.json`，否则把服务器持久化进 profile 的 `mcp-manager` 配置 |

@@ -10,7 +10,7 @@ wired at the right scope, and a dedicated **JITx hardware** agent preset.
 
 | Piece | Where | What it gives you |
 | --- | --- | --- |
-| `jitx_env_setup` tool | Host | Scaffolds a JITx project, pins `jitx` + `jitxlib-standard` with uv, syncs `.venv`/`uv.lock`, installs the JITx runtime |
+| `jitx_env_setup` tool | Host | Scaffolds a JITx project, pins `jitx` + `jitxlib-standard` with uv, syncs `.venv`/`uv.lock`, installs the JITx runtime; reuses an environment that already matches instead of rebuilding it |
 | `jitx_check` tool | Host | Read-only health check (uv, Python 3.12+, CLI, runtime, license, skills, MCP scope) |
 | `jitx_skills_install` tool | Host | Copies the 13 official skills from [JITx-Inc/jitx-skills](https://github.com/JITx-Inc/jitx-skills) into `<project>/.dsh/skills`; falls back to `$DSH_HOME/skills` when the project is not writable |
 | `jitx_mcp_setup` tool | Host | Writes `<project>/.dsh/mcp.json` when `dsh-workspace-mcp` is active, otherwise persists the server in the profile's `mcp-manager` config |
