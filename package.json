@@ -18,7 +18,8 @@
     "docs",
     "icon.svg",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "README.zh.md"
   ],
   "engines": {
     "node": ">=22",
